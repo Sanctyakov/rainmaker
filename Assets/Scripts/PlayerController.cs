@@ -1,11 +1,9 @@
 using UnityEngine;
 
-// Determina que un objeto puede ser dañado.
+// Mueve un personaje jugable según input.
 
-public class HealthComponent : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
-    public int maxHealth = 100; // Salud máxima del objeto
-    public int currentHealth; // Salud actual del objeto
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

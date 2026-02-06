@@ -1,11 +1,9 @@
 using UnityEngine;
 
-// Determina que un objeto puede ser dañado.
+// Elige una acción dependiendo de un behavior tree.
 
-public class HealthComponent : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
-    public int maxHealth = 100; // Salud máxima del objeto
-    public int currentHealth; // Salud actual del objeto
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
