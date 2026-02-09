@@ -30,4 +30,18 @@ public class BattleManager : MonoBehaviour
     {
 
     }
+
+    void RollInitiative() 
+    {
+        // Lógica para determinar quién se mueve primero
+        // Por ahora, simplemente selecciona al azar entre el jugador y el enemigo
+        if (Random.value > 0.5f)
+        {
+            Debug.Log("El jugador se mueve primero.");
+        }
+        else
+        {
+            Debug.Log("El enemigo se mueve primero.");
+        }
+    }
 }
