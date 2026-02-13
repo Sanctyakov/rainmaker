@@ -8,6 +8,7 @@ public class BattleManager : MonoBehaviour
     public GameObject enemyPrefab; // Prefab del enemigo
     public Transform playerSpawnPoint; // Punto de spawn del jugador
     public Transform enemySpawnPoint; // Punto de spawn del enemigo
+    public Canvas battleMenu; // Canvas para mostrar la interfaz de batalla
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,5 +44,18 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("El enemigo se mueve primero.");
         }
+    }
+
+    void SetPlayerTurn()
+    {
+        // Lógica para establecer el turno del jugador
+        battleMenu.gameObject.SetActive(true); // Activa el menú de batalla para que el jugador pueda elegir su acción
+    }
+
+    void SetEnemyTurn()
+    {
+        // Lógica para establecer el turno del enemigo
+        battleMenu.gameObject.SetActive(false); // Desactiva el menú de batalla durante el turno del enemigo
+        // Aquí se podría agregar la lógica para que el enemigo tome su acción, como atacar al jugador o usar una habilidad
     }
 }
