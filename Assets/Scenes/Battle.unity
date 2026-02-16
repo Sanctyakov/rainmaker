@@ -1858,11 +1858,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1905012209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01afa6bce4c7da04695d0032610d831c, type: 3}
+  m_Script: {fileID: 11500000, guid: 98b3ac40ae47c284193c4dbbb624e1a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  direction: {x: 0, y: 0, z: 1}
-  speed: 5
+  centerPoint: {fileID: 0}
+  radius: 5
+  speed: 1
+  initialAngle: 0
+  tidalLock: 0
 --- !u!1001 &1950829336
 PrefabInstance:
   m_ObjectHideFlags: 0
