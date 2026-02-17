@@ -8,7 +8,7 @@ public class BattleManager : MonoBehaviour
     public GameObject enemyPrefab; // Prefab del enemigo
     public Transform playerSpawnPoint; // Punto de spawn del jugador
     public Transform enemySpawnPoint; // Punto de spawn del enemigo
-    public Canvas battleMenu; // Canvas para mostrar la interfaz de batalla
+    public BattleMenu battleMenu; // Canvas para mostrar la interfaz de batalla
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
