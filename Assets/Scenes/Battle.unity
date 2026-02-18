@@ -1861,11 +1861,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98b3ac40ae47c284193c4dbbb624e1a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  centerPoint: {fileID: 0}
+  centerPoint: {fileID: 1950829338}
   radius: 5
-  speed: 1
+  speed: 10
   initialAngle: 0
-  tidalLock: 0
+  tidalLock: 1
+  autoStart: 1
 --- !u!1001 &1950829336
 PrefabInstance:
   m_ObjectHideFlags: 0
