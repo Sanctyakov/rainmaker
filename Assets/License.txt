@@ -1,9 +1,9 @@
 	
 
-	KayKit : Adventurers Character Pack (2.0)
+	KayKit : RPG Tools Bits (1.0)
 
 	Created/distributed by Kay Lousberg (www.kaylousberg.com)
-	Creation date: 22/10/2025 09:00
+	Creation date: 26/11/2025 09:00
 
 			------------------------------
 
