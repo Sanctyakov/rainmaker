@@ -1870,6 +1870,8 @@ MonoBehaviour:
   initialAngle: 0
   tidalLock: 1
   autoStart: 1
+  animator: {fileID: 1905012212}
+  animationTrigger: Strafe right
 --- !u!95 &1905012212
 Animator:
   serializedVersion: 7

@@ -10,10 +10,14 @@ public class OrbitalMovementComponent : MonoBehaviour
     public float initialAngle = 0f; // The initial angle of the orbit in degrees
     public bool tidalLock = false; // If true, the object will always face the center point
     public bool autoStart = true; // If true, the orbit will start automatically
+    
+    
+    public Animator animator; // Reference to the Animator component for playing animations
+    public string animationTrigger = "Orbiting"; // The name of the animation bool to set when orbiting.
 
     void Start()
     {
-        
+   
     }
 
     // Update is called once per frame
@@ -21,18 +25,25 @@ public class OrbitalMovementComponent : MonoBehaviour
     {
         if (autoStart)
         {
-            AutoOrbit();
+            Orbit();
         }
 
     }
 
-    void AutoOrbit() {         if (centerPoint == null) return; // Ensure there is a center point to orbit around
+    void Orbit() {
+        if (animationTrigger != null) animator.SetTrigger(animationTrigger); // Start the orbiting animation if an animation bool is specified
+        else Debug.LogWarning("Animation trigger is not set for OrbitalMovementComponent on " + gameObject.name);
+
+        if (centerPoint == null) return; // Ensure there is a center point to orbit around
+        
         // Calculate the current angle based on time and speed
         float angle = initialAngle + Time.time * speed;
         float radians = angle * Mathf.Deg2Rad; // Convert angle to radians
+        
         // Calculate the new position in the orbit
         Vector3 offset = new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)) * radius;
         transform.position = centerPoint.position + offset;
+        
         // If tidal lock is enabled, rotate the object to always face the center point
         if (tidalLock)
         {
