@@ -1,19 +1,41 @@
+using System;
 using UnityEngine;
 
 // Moves an object in an orbit around a specified center point at a given radius and speed. This can be used for planets, satellites, or any object that needs to orbit around another object.
 
-public class OrbitalMovementComponent : MonoBehaviour
+
+[Serializable] public class OrbitalMovementComponent : MonoBehaviour
 {
-    public Transform centerPoint; // The point around which the object will orbit
-    public float radius = 5f; // The radius of the orbit
-    public float speed = 1f; // The speed of the orbit
-    public float initialAngle = 0f; // The initial angle of the orbit in degrees
-    public bool tidalLock = false; // If true, the object will always face the center point
-    public bool autoStart = true; // If true, the orbit will start automatically
-    
-    
-    public Animator animator; // Reference to the Animator component for playing animations
-    public string animationTrigger = "Orbiting"; // The name of the animation bool to set when orbiting.
+    [SerializeField, Tooltip("The point around which the object will orbit.")]
+    Transform centerPoint;
+
+    [SerializeField, Tooltip("The radius of the orbit.")]
+    float radius = 5f;
+
+    [SerializeField, Tooltip("The speed of the orbit. Positive values will orbit clockwise, negative values will orbit counterclockwise.")]
+    float speed = 1f;
+
+    [SerializeField, Tooltip("The initial angle of the orbit in degrees.")]
+    float initialAngle = 0f;
+
+    [SerializeField, Tooltip("If true, the object will always face the center point.")]
+    bool tidalLock = true;
+
+    [SerializeField, Tooltip("If true, the orbit will start automatically.")]
+    bool autoStart = true;
+
+    [SerializeField, Tooltip("Reference to the Animator component for playing animations.")]
+    private Animator animator;
+
+    #region Animation
+
+    [SerializeField, Tooltip("The name of the animation bool to set when orbiting counterclockwise.")]
+    string animationTriggerCounterclockwise = "OrbitingCounterclockwise";
+
+    [SerializeField, Tooltip("The name of the animation bool to set when orbiting clockwise.")]
+    string animationTriggerClockwise = "OrbitingClockwise";
+
+    #endregion
 
     void Start()
     {
@@ -31,8 +53,17 @@ public class OrbitalMovementComponent : MonoBehaviour
     }
 
     void Orbit() {
-        if (animationTrigger != null) animator.SetTrigger(animationTrigger); // Start the orbiting animation if an animation bool is specified
-        else Debug.LogWarning("Animation trigger is not set for OrbitalMovementComponent on " + gameObject.name);
+
+        if (animator != null)
+        {
+            if (animationTriggerClockwise == null || animationTriggerCounterclockwise == null) return; // Ensure there are animation triggers specified before trying to set them
+            Debug.LogWarning("Animation triggers are not specified for the OrbitalMovementComponent. Please set the animationTriggerRight and animationTriggerLeft fields to use animations.");
+
+            if (speed > 0) animator.SetTrigger(animationTriggerCounterclockwise); // Start the orbiting animation if an animation bool is specified
+            else if (speed < 0) animator.SetTrigger(animationTriggerClockwise); // Start the orbiting animation if an animation bool is specified
+        }
+        else Debug.LogWarning("No Animator component found on the object with the OrbitalMovementComponent. Please add an Animator component and set the animator field to use animations.");
+
 
         if (centerPoint == null) return; // Ensure there is a center point to orbit around
         
