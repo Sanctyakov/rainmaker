@@ -1,13 +1,12 @@
 using System;
 using UnityEngine;
 
-// Moves an object in an orbit around a specified center point at a given radius and speed. This can be used for planets, satellites, or any object that needs to orbit around another object.
-
-
-[Serializable] public class OrbitalMovementComponent : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+[Serializable]
+public class OrbitalMovementComponent : MonoBehaviour
 {
     [SerializeField, Tooltip("The point around which the object will orbit.")]
-    Transform centerPoint;
+    Transform orbitCenter;
 
     [SerializeField, Tooltip("The radius of the orbit.")]
     float radius = 5f;
@@ -37,48 +36,96 @@ using UnityEngine;
 
     #endregion
 
+    Rigidbody rb;
+    Vector3 lastCenterPosition;
+    float currentAngle;
+
     void Start()
     {
-   
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            Debug.LogError("OrbitalMovementComponent requires a Rigidbody on the same GameObject.");
+            enabled = false;
+            return;
+        }
+
+        if (orbitCenter == null)
+        {
+            Debug.LogError("No center point specified for the OrbitalMovementComponent. Please set the centerPoint field to a valid Transform.");
+            enabled = false;
+            return;
+        }
+
+        currentAngle = initialAngle;
+        float radians = currentAngle * Mathf.Deg2Rad;
+        Vector3 offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * radius;
+        rb.position = orbitCenter.position + offset;
+        lastCenterPosition = orbitCenter.position;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         if (autoStart)
         {
             Orbit();
         }
-
     }
 
-    void Orbit() {
+    void Orbit()
+    {
+        if (orbitCenter == null || rb == null) return;
 
+        // Animation handling (only set triggers when provided)
         if (animator != null)
         {
-            if (animationTriggerClockwise == null || animationTriggerCounterclockwise == null) return; // Ensure there are animation triggers specified before trying to set them
-            Debug.LogWarning("Animation triggers are not specified for the OrbitalMovementComponent. Please set the animationTriggerRight and animationTriggerLeft fields to use animations.");
-
-            if (speed > 0) animator.SetTrigger(animationTriggerCounterclockwise); // Start the orbiting animation if an animation bool is specified
-            else if (speed < 0) animator.SetTrigger(animationTriggerClockwise); // Start the orbiting animation if an animation bool is specified
+            if (string.IsNullOrWhiteSpace(animationTriggerClockwise) || string.IsNullOrWhiteSpace(animationTriggerCounterclockwise))
+            {
+                Debug.LogWarning("Animation triggers are not specified for the OrbitalMovementComponent. Please set the animationTriggerClockwise and animationTriggerCounterclockwise fields to use animations.");
+            }
+            else
+            {
+                if (speed > 0f) animator.SetTrigger(animationTriggerCounterclockwise);
+                else if (speed < 0f) animator.SetTrigger(animationTriggerClockwise);
+            }
         }
-        else Debug.LogWarning("No Animator component found on the object with the OrbitalMovementComponent. Please add an Animator component and set the animator field to use animations.");
+        else
+        {
+            Debug.LogWarning("No Animator component found on the object with the OrbitalMovementComponent. Please add an Animator component and set the animator field to use animations.");
+        }
 
+        // Update the orbital angle (speed is degrees per second)
+        currentAngle += speed * Time.fixedDeltaTime;
+        float radians = currentAngle * Mathf.Deg2Rad;
 
-        if (centerPoint == null) return; // Ensure there is a center point to orbit around
-        
-        // Calculate the current angle based on time and speed
-        float angle = initialAngle + Time.time * speed;
-        float radians = angle * Mathf.Deg2Rad; // Convert angle to radians
-        
-        // Calculate the new position in the orbit
-        Vector3 offset = new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians)) * radius;
-        transform.position = centerPoint.position + offset;
-        
-        // If tidal lock is enabled, rotate the object to always face the center point
+        // Desired position on orbit
+        Vector3 offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * radius;
+        Vector3 desiredPosition = orbitCenter.position + offset;
+
+        // Compute center velocity (handles moving centerPoint)
+        Vector3 centerVelocity = (orbitCenter.position - lastCenterPosition) / Time.fixedDeltaTime;
+        lastCenterPosition = orbitCenter.position;
+
+        // Tangential (orbital) velocity: v = omega x r, where omega = speed (deg/s) -> convert to rad/s
+        float omega = speed * Mathf.Deg2Rad;
+        Vector3 tangentialDirection = new Vector3(-Mathf.Sin(radians), 0f, Mathf.Cos(radians)); // perpendicular to radius
+        Vector3 orbitalVelocity = tangentialDirection * (radius * omega);
+
+        // Final world velocity
+        Vector3 finalVelocity = orbitalVelocity + centerVelocity;
+
+        // Apply velocity to Rigidbody (physics-driven movement)
+        rb.linearVelocity = finalVelocity;
+
+        // Tidal lock: rotate to face center using physics-friendly rotation
         if (tidalLock)
         {
-            transform.LookAt(centerPoint);
+            Vector3 toCenter = orbitCenter.position - rb.position;
+            if (toCenter.sqrMagnitude > 0.0001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(toCenter);
+                rb.MoveRotation(targetRotation);
+            }
         }
     }
 }
