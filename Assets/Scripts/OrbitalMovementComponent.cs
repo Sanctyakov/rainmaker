@@ -74,9 +74,9 @@ public class OrbitalMovementComponent : MonoBehaviour
 
     void Orbit()
     {
-        if (orbitCenter == null || rb == null) return;
+        if (orbitCenter == null) return;
 
-        // Animation handling (only set triggers when provided)
+        // Animation triggers (only when animator is present)
         if (animator != null)
         {
             if (string.IsNullOrWhiteSpace(animationTriggerClockwise) || string.IsNullOrWhiteSpace(animationTriggerCounterclockwise))
@@ -89,10 +89,6 @@ public class OrbitalMovementComponent : MonoBehaviour
                 else if (speed < 0f) animator.SetTrigger(animationTriggerClockwise);
             }
         }
-        else
-        {
-            Debug.LogWarning("No Animator component found on the object with the OrbitalMovementComponent. Please add an Animator component and set the animator field to use animations.");
-        }
 
         // Update the orbital angle (speed is degrees per second)
         currentAngle += speed * Time.fixedDeltaTime;
@@ -102,29 +98,42 @@ public class OrbitalMovementComponent : MonoBehaviour
         Vector3 offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * radius;
         Vector3 desiredPosition = orbitCenter.position + offset;
 
-        // Compute center velocity (handles moving centerPoint)
+        // Compute center velocity (handles moving orbit center)
         Vector3 centerVelocity = (orbitCenter.position - lastCenterPosition) / Time.fixedDeltaTime;
         lastCenterPosition = orbitCenter.position;
 
-        // Tangential (orbital) velocity: v = omega x r, where omega = speed (deg/s) -> convert to rad/s
-        float omega = speed * Mathf.Deg2Rad;
-        Vector3 tangentialDirection = new Vector3(-Mathf.Sin(radians), 0f, Mathf.Cos(radians)); // perpendicular to radius
-        Vector3 orbitalVelocity = tangentialDirection * (radius * omega);
-
-        // Final world velocity
-        Vector3 finalVelocity = orbitalVelocity + centerVelocity;
-
-        // Apply velocity to Rigidbody (physics-driven movement)
-        rb.linearVelocity = finalVelocity;
-
-        // Tidal lock: rotate to face center using physics-friendly rotation
-        if (tidalLock)
+        if (rb != null)
         {
-            Vector3 toCenter = orbitCenter.position - rb.position;
-            if (toCenter.sqrMagnitude > 0.0001f)
+            // Tangential (orbital) velocity: v = omega x r, where omega = speed (deg/s) -> convert to rad/s
+            float omega = speed * Mathf.Deg2Rad;
+            Vector3 tangentialDirection = new Vector3(-Mathf.Sin(radians), 0f, Mathf.Cos(radians)); // perpendicular to radius
+            Vector3 orbitalVelocity = tangentialDirection * (radius * omega);
+
+            // Final world velocity
+            Vector3 finalVelocity = orbitalVelocity + centerVelocity;
+
+            // Apply velocity to Rigidbody (physics-driven movement)
+            rb.linearVelocity = finalVelocity;
+
+            // Tidal lock: rotate to face center using physics-friendly rotation
+            if (tidalLock)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(toCenter);
-                rb.MoveRotation(targetRotation);
+                Vector3 toCenter = orbitCenter.position - rb.position;
+                if (toCenter.sqrMagnitude > 0.0001f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(toCenter);
+                    rb.MoveRotation(targetRotation);
+                }
+            }
+        }
+        else
+        {
+            // Fallback: direct transform updates when there's no Rigidbody
+            transform.position = desiredPosition;
+
+            if (tidalLock)
+            {
+                transform.LookAt(orbitCenter);
             }
         }
     }
