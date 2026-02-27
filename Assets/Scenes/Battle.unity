@@ -1869,13 +1869,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   orbitCenter: {fileID: 1950829338}
   radius: 5
-  speed: 50
+  autoSpeed: 50
+  maxOrbitSpeed: 180
   initialAngle: 0
   tidalLock: 1
-  autoStart: 1
+  auto: 1
   animator: {fileID: 1905012212}
-  animationTriggerCounterclockwise: Strafe right
-  animationTriggerClockwise: Strafe left
+  inputAxis: Horizontal
+  inputDeadzone: 0.05
+  animationTriggerCounterclockwise: Strafe left
+  animationTriggerClockwise: Strafe right
 --- !u!95 &1905012212
 Animator:
   serializedVersion: 7
