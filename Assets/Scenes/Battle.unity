@@ -1873,7 +1873,7 @@ MonoBehaviour:
   maxOrbitSpeed: 180
   initialAngle: 0
   tidalLock: 1
-  auto: 1
+  auto: 0
   animator: {fileID: 1905012212}
   inputAxis: Horizontal
   inputDeadzone: 0.05
